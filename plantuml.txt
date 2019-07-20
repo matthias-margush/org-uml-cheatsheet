@@ -1,0 +1,87 @@
+hide footbox
+hide circle
+hide empty members
+
+skinparam {
+        backgroundColor transparent
+        defaultFontName Helvetica
+        shadowing false
+        BoxPadding 20
+}
+
+skinparam class {
+        BackgroundColor transparent
+        BorderColor #4682AF
+        FontColor #2B4156
+}
+
+skinparam usecase {
+        BackgroundColor transparent
+        BorderColor #4682AF
+        FontColor #2B4156
+}
+
+skinparam sequenceActor {
+        BackgroundColor transparent
+        BorderColor #4682AF
+        FontColor #2B4156
+}
+
+skinparam note {
+        BorderColor #52A83B
+        FontColor #2B4156
+        BackgroundColor #D3EDCE
+}
+
+skinparam sequenceBox {
+        BorderColor #4682AF
+        FontColor #2B4156
+        BackgroundColor #F9DEDE
+}
+
+skinparam sequenceArrow {
+        Color #4682AF
+        FontColor #2B4156
+}
+
+skinparam sequenceLifeLine {
+        BackgroundColor transparent
+        BorderColor #4682AF
+        FontColor #2B4156
+}
+
+skinparam sequenceParticipant {
+        BackgroundColor transparent
+        BorderColor #4682AF
+        FontColor #2B4156
+}
+
+skinparam boundary {
+        BackgroundColor transparent
+        BorderColor #4682AF
+        FontColor #2B4156
+}
+
+skinparam control {
+        BackgroundColor transparent
+        BorderColor #4682AF
+        FontColor #2B4156
+}
+
+skinparam entity {
+        BackgroundColor transparent
+        BorderColor #4682AF
+        FontColor #2B4156
+}
+
+skinparam database {
+        BackgroundColor transparent
+        BorderColor #4682AF
+        FontColor #2B4156
+}
+
+skinparam collections {
+        BackgroundColor transparent
+        BorderColor #4682AF
+        FontColor #2B4156
+}

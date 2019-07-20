@@ -1,0 +1,644 @@
+#+TITLE: Diagramming
+#+STARTUP: inlineimages
+
+[[file:README.pdf][See Rendered PDF]]
+
+* Configure
++ System: install plantuml (e.g. ~brew install plantuml~)
++ Emacs: install [[https://github.com/skuro/plantuml-mode][plantuml-mode]]. Configuration:
+#+begin_src emacs-lisp
+  (setq plantuml-jar-path "/usr/local/Cellar/plantuml/1.2019.6/libexec/plantuml.jar")
+  (setq plantuml-jar-args '("-charset" "UTF-8" "-config" "~/plantuml.txt"))
+  (setq org-startup-with-inline-images t)
+  (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((plantuml . t)))
+#+end_src
++ ~C-c C-c~ in a source block to render a diagram.
++ May need to ~org-toggle-inline-images~ to view inline.
+
+* Embedding a Diagram
++ ~#+begin_src plantuml :file output.png~ :: Begin diagram
++ ~#+end_src~ :: End diagram
++ ~#+STARTUP: inlineimages~ :: Display [[https://google.com][diagrams]] inline (put at top of file)
+
+** Example
+#+name: Hello Alice
+#+begin_src plantuml :file hello.png :cmdline -config plantuml.txt
+  Bob -> Alice : Hello, alice
+#+end_src
+#+RESULTS: Hello Alice
+[[file:hello.png]]
+
+* Use Case Diagrams
+#+begin_src plantuml :file usecase.png :cmdline -config plantuml.txt
+  User -> (Start)
+  User --> (Use the application) : A small label
+
+  :Main Admin: ---> (Use the application) : This is\nyet another\nlabel
+#+end_src
+
+#+RESULTS:
+[[file:usecase.png]]
+
+* Sequence Diagrams
+
+** Arrows
++ ~->~ or ~<-~ :: Solid arrow
++ ~-->~ or ~<--~ :: Dotted arrow
++ ~-\~ or ~-/~ :: Half arrowhead
++ -~\\~, ~->>~, ~<<-~, ~-//~ :: Skinny arrowhead
++ ~->o~ :: Arrow points to circle
++ ~<->~ :: Bidirectional arrow
++ ~-[#red]->~ :: Arrow color
++ ~[->~, ~->]~, ~[<-~, ~<-]~ :: Un-anchored lines
+
+*** Example Sequence Diagram Arrows
+#+name: Sequence arrows
+#+begin_src plantuml :file arrows.png :cmdline -config plantuml.txt
+  Bob ->x Alice
+  Bob -> Alice
+  Bob ->> Alice
+  Bob -\ Alice
+  Bob \\- Alice
+  Bob //-- Alice
+  Bob ->o Alice
+  Bob o\\-- Alice
+  Bob <-[#green]-> Alice
+  Bob <->o Alice
+  Bob -> Bob
+  Alice -> Alice
+  [--> Bob
+  Alice -->]
+  [<-- Bob
+  Alice <--]
+#+end_src
+
+#+RESULTS: Sequence arrows
+[[file:arrows.png]]
+
+** Participants
++ ~actor ActorName~ :: Define an actor
++ ~boundary BoundaryName~ :: Define boundary system
++ ~control ControlName~ :: Define a control system
++ ~entity EntityName~ :: Define an entity
++ ~database DatabaseName~ :: Define a database
++ ~collections CollectionsName~ :: Define a collection
+
+*** Example Sequence Diagram
+#+name: Sequence Diagram with participant types
+#+begin_src plantuml :file participants.png :cmdline -config plantuml.txt
+  actor        Actor #red
+  boundary     Boundary #orange
+  control      Control #yellow
+  entity       Entity #green
+  database     Database #blue
+  collections  Collections #white
+  participant  Participant #white
+
+  Actor -> Boundary : To boundary
+  Actor -> Control : To control
+  Actor -> Entity : To entity
+  Actor -> Database : To database
+  Actor -> Collections : To collections
+  Actor -> Participant : To Participant
+#+end_src
+
+#+RESULTS: Sequence Diagram with participant types
+[[file:participants.png]]
+
+*** Sequence Numbering
++ ~autonumber <start>~ :: Begin numbering at <start> or 1
+
+**** Example autonumbering
+#+name: Sequence Diagram with sequence numbering
+#+begin_src plantuml :file numbering.png :cmdline -config plantuml.txt
+  actor        Actor #red
+  boundary     Boundary #orange
+  control      Control #yellow
+  entity       Entity #green
+  database     Database #blue
+  collections  Collections #white
+  participant  Participant #white
+
+  autonumber
+  Actor -> Boundary : To boundary
+  Actor -> Control : To control
+  Actor -> Entity : To entity
+  Actor -> Database : To database
+  Actor -> Collections : To collections
+  Actor -> Participant : To Participant
+#+end_src
+
+#+RESULTS: Sequence Diagram with sequence numbering
+[[file:numbering.png]]
+
+*** Page Titles, Headers, Footers
++ ~header <content>~ :: Defines header content
++ ~title~ <content> :: Defines title content
++ ~footer <content>~ :: Defines footer content
+
+**** Example Titles, Headers, Footers
+#+name: Sequence Diagram with titles, header, footer
+#+begin_src plantuml :file titles.png :cmdline -config plantuml.txt
+  title Sequence Title Example
+  header Sequence Diagrams
+  footer Page %page% of %lastpage%
+
+  actor        Actor #red
+  boundary     Boundary #orange
+  control      Control #yellow
+  entity       Entity #green
+  database     Database #blue
+  collections  Collections #white
+  participant  Participant #white
+
+  autonumber
+  Actor -> Boundary : To boundary
+  Actor -> Control : To control
+  Actor -> Entity : To entity
+  Actor -> Database : To database
+  Actor -> Collections : To collections
+  Actor -> Participant : To Participant
+#+end_src
+
+#+RESULTS: Sequence Diagram with titles, header, footer
+[[file:titles.png]]
+
+** Sequence Grouping Boxes
+- ~alt <title> ... else <title> ... end~ :: Define alternates
+- ~loop <title>~ :: Steps in group are looped
+- ~par~ :: Steps run in parallel
+- ~break~ :: Steps supercede subsequent steps
+- ~critical~ :: Steps must not be interleaved
+- ~group <title>~ :: Custom grouping
+
+*** Example Sequence Diagram - Alternates
+#+name: Sequence Diagram with Alternates
+#+begin_src plantuml :file alternates.png :cmdline -config plantuml.txt
+  title Sequence Diagram with Alternate Paths
+
+  Alice -> Bob: Authentication Request
+
+  alt Successful authentication
+
+          Bob -> Alice: Authentication Accepted
+
+  else Authentication failure
+
+          Bob -> Alice: Authentication Failure
+
+  else Connection failure
+
+          Alice -> Bob: Repeat request
+  end
+#+end_src
+
+#+RESULTS: Sequence Diagram with Alternates
+[[file:alternates.png]]
+
+*** Example Sequence Diagram - Loops
+#+name: Sequence Diagram with Loop
+#+begin_src plantuml :file loops.png :cmdline -config plantuml.txt
+  title Sequence Diagram with Loop
+
+  Alice -> Log : Log attack start
+  loop 1000 times
+          Alice -> Bob: DNS Attack
+  end
+#+end_src
+
+#+RESULTS: Sequence Diagram with Loop
+[[file:loops.png]]
+
+*** Example Sequence Diagram - Parallel
+#+name: Sequence Diagram with Parallel
+#+begin_src plantuml :file par.png :cmdline -config plantuml.txt
+  title Sequence Diagram with Parallel
+
+  Alice -> Log : Log attack start
+  par
+          Alice -> Bob: DNS Attack
+          Alice -> Bob: Fuzz Attack
+          Alice -> Bob: Social Engineering Attack
+  end
+#+end_src
+
+#+RESULTS: Sequence Diagram with Parallel
+[[file:par.png]]
+
+** Notes
+*** Notes relative to message
+Put note below the message
++ ~note left: <note text>~ :: Add a note to the left
++ ~note right: <note right>~ :: Add a note to the right
++ ~note left ... end note~ :: Multiline note
+
+*** Notes relative to participant
+Put note below the participant
++ ~note left of <Participant>~ :: Place note left of participant
++ ~note over <Participant>~ :: Place note over participant
++ ~note right of <Particpant>~ :: Place note right of participant
+*** Example Sequence Diagram With Notes
+#+name: Sequence Diagram With Notes
+#+begin_src plantuml :file notes.png :cmdline -config plantuml.txt
+  title Sequence Diagram With Notes
+
+  participant Alice
+  participant Bob
+
+  Alice -> Bob : Good Morning. How was your weekend?
+  note left: Alice greets Bob.
+
+  Alice <- Bob : Hi Alice! Great snow in Tahoe this weekend.
+  note right #E3DCCA: Bob greets Alice.
+
+  note left of Alice #E3DCCA
+          This is displayed
+          Left of alice.
+  end note
+
+  note right of Alice: This is displayed to the right of Alice.
+  note over Alice: This is displayed over Alice.
+  note over Alice, Bob #F9DEDE
+          This is displayed
+          over Alice and Bob.
+  end note
+#+end_src
+
+#+RESULTS: Sequence Diagram With Notes
+[[file:notes.png]]
+
+** Formatting
++ ~**bold**~ :: Bold text
++ ~//italics//~ :: Italics text
++ ~""monospaced""~ :: Monospaced text
++ ~--strikethrough--~ :: Strikethrough text
++ ~__underline__~ :: Underlined text
++ =~~wavy underline~~= :: Wavy underline text
+
+*** Example Sequence Diagram With Formatting
+#+name: Sequence Diagram With Formatting
+#+begin_src plantuml :file formatting.png :cmdline -config plantuml.txt
+  title Sequence Diagram With Formatting
+
+  participant Alice
+  participant "The **Famous** Bob" as Bob
+
+  Alice -> Bob : hello --there--
+  ... Some ~~long delay~~ ...
+  Bob -> Alice : ok
+  note left
+    This is **bold**
+    This is //italics//
+    This is ""monospaced""
+    This is --stroked--
+    This is __underlined__
+    This is ~~waved~~
+  end note
+
+  Alice -> Bob : A //well formatted// message
+  note right of Alice 
+   This is <back:cadetblue><size:18>displayed</size></back> 
+   __left of__ Alice. 
+  end note
+  note left of Bob 
+   <u:red>This</u> is <color #118888>displayed</color> 
+   ,**<color purple>left of</color> <s:red>Alice</strike> Bob**. 
+  end note
+#+end_src
+
+#+RESULTS: Sequence Diagram With Formatting
+[[file:formatting.png]]
+
+** Splits
++ ~== label ==~ :: Insert a split
+
+*** Example Sequence Diagram With Split
+#+name: Example Sequence Diagram With Split
+#+begin_src plantuml :file splits.png :cmdline -config plantuml.txt
+  title Sequence Diagram With Splits
+
+  == Initialization ==
+
+  Alice -> Bob: Authentication Request
+  Bob --> Alice: Authentication Response
+
+  == ==
+
+  Alice -> Bob: Another authentication Request
+  Alice <-- Bob: another authentication Response
+
+#+end_src
+
+#+RESULTS: Example Sequence Diagram With Split
+[[file:splits.png]]
+
+** Delays & Spacing
++ ~...~ :: A delay in the sequence
++ ~|||~ :: Add extra Vertical Spacing
+
+*** Example Sequence Diagram With Delays And Spacing
+#+name: Example Sequence Diagram With Delays And Spacing
+#+begin_src plantuml :file spacing.png :cmdline -config plantuml.txt
+  title Sequence Diagram With Delays and Spacing
+
+  Alice -> Bob: message 1
+  ...
+  Bob --> Alice: ok
+  |||
+  Alice -> Bob: message 2
+  ...5 minutes later...
+  Bob --> Alice: ok
+  ||45||
+  Alice -> Bob: message 3
+  Bob --> Alice: ok
+#+end_src
+
+#+RESULTS: Example Sequence Diagram With Delays And Spacing
+[[file:spacing.png]]
+
+** Lifelines
++ ~activate <id>~ or ~++~ :: Mark start of lifeline <id>
++ ~deactivate <id>~ or ~--~ :: Mark end of lifeline <id>
++ ~autoactivate on~ :: Turn on autoactivation
++ ~create <type> <name>~ or ~**~ :: Create a participant
++ ~destroy <id>~ or ~!!~ :: Destroy participant
++ ~return <label>~ :: Deactivate lifeline with <label>
+
+*** Example Sequence Diagram With Lifelines
+#+name: Example Sequence Diagram With Lifelines
+#+begin_src plantuml :file lifelines.png :cmdline -config plantuml.txt
+  title Sequence Diagram With Lifelines
+
+  participant User
+
+  User -> A: DoWork
+  activate A #4682AF
+        
+  A -> A: Internal call
+  activate A #F9DEDE
+
+  A -> B: << createRequest >>
+  activate B
+
+  B -> C: DoWork
+  activate C
+
+  C --> B: WorkDone
+  destroy C
+
+  B --> A: RequestCreated
+  deactivate B
+  deactivate A
+
+  A -> User: Done
+  deactivate A
+#+end_src
+
+#+RESULTS: Example Sequence Diagram With Lifelines
+[[file:lifelines.png]]
+
+*** Example Sequence Diagram With Auto-lifelines
+#+name: Example Sequence Diagram With Auto-Lifelines
+#+begin_src plantuml :file autolifelines.png :cmdline -config plantuml.txt
+  title Sequence Diagram With Auto-Lifelines
+  autoactivate on
+
+  participant User
+
+  User -> A: UserRequest
+  A -> A: Internal call
+  A -> B: << createRequest >>
+  B -> C: DoWork
+  return Work Done
+  return RequestCreated
+  return InternalResponse
+  return UserResponse
+#+end_src
+
+#+RESULTS: Example Sequence Diagram With Auto-Lifelines
+[[file:autolifelines.png]]
+
+*** Example Sequence with Shortcut Lifelines
+#+name: Example Sequence Diagram With Shortcut Lifelines
+#+begin_src plantuml :file shortlifelines.png :cmdline -config plantuml.txt
+  title Sequence Diagram With Shortcut Lifelines
+  alice -> bob ++ : hello
+  bob -> bob ++ : self call
+  bob -> bib ++  #005500 : hello
+  bob -> george ** : create
+  return done
+  return rc
+  bob -> george !! : delete
+  return success
+#+end_src
+
+** Participant Creation
++ ~create <participant type> <participant name> :: Create a participant
+
+*** Example Sequence Diagram With Participant Creation
+#+name: Example Sequence Diagram With Participant Creation
+#+begin_src plantuml :file participant.png :cmdline -config plantuml.txt
+  title Sequence Diagram With Participant Creation
+  Bob -> Alice : hello
+
+  create Other
+  Alice -> Other : new
+
+  create control String
+  Alice -> String
+  note right : You can also put notes!
+
+  Alice --> Bob : ok
+#+end_src
+
+#+RESULTS: Example Sequence Diagram With Participant Creation
+[[file:participant.png]]
+
+** System Boundaries
++ ~box <name> <color> ... end box~ :: Wrap in a box
+*** Example Sequence Diagram With System Boundary
+#+name: Example Sequence Diagram With System Boundary
+#+begin_src plantuml :file systemboundary.png :cmdline -config plantuml.txt
+  title Sequence Diagram With System Boundary
+
+  box "Internal Service"
+          participant Bob
+          participant Alice
+  end box
+  participant Other
+
+  Bob -> Alice : hello
+  Alice -> Other : hello
+#+end_src
+
+#+RESULTS: Example Sequence Diagram With System Boundary
+[[file:systemboundary.png]]
+
+* Entity Diagrams
+** Entities
++ ~entity EntityName~ :: Define an entity
++ ~* indentifying_attribute~ :: Identifying attribute
++ ~--~ :: Divider
++ ~* indentifying_attribute~ :: Identifying attribute
++ ~optional_attribute~ :: Optional attribute
+
+** Connectors
++ ~A |o--o| B~ :: Zero or one
++ ~A ||--|| B~ :: Eactly one
++ ~A }o--o{ B~ :: Zero or many ("crows foot")
++ ~A }|--|{~ :: One or many
+
+** Example Entity Diagram
+#+name: Example Entity Diagram
+#+begin_src plantuml :file entity.png :cmdline -config plantuml.txt
+  title Example Entity Relationship Diagram
+
+  entity Customer {
+          first_name
+          last_name
+  }
+
+  entity Address {
+          street_1
+          street_2
+          city
+          state
+          postal_code
+          country
+  }
+
+  entity Order {
+          order_amount
+          tax_amount
+          shipping_amount
+          total_amount
+  }
+
+  entity OrderItem {
+  }
+
+  entity Item {
+          description
+  }
+
+  Customer }o--o{ Address
+  Order }o--o{ Customer
+  Order }o--|| Address : shipping
+  Order }o--o| Address : billing
+  Order ||--|{ OrderItem
+  OrderItem }o--|| Item
+#+end_src
+
+#+RESULTS: Example Entity Diagram
+[[file:entity.png]]
+
+*	Class Diagrams
+** Lines
++ ~--~ :: Solid line
++ ~..~ :: Dotted line
+
+** Arrows
++ ~<|--~, ~--|>~ :: Extension
++ ~*--~, ~--*~ :: Composition
++ ~o--~, ~--o~ :: Aggregation
++ ~()--~, ~--()~ :: Lollipop (interfaces)
+
+** Vertical vs Horizontal Layout
++ ~--~ :: Relationships with two dashes are laid out vertically
++ ~-~ :: Relationships with one dash are laid out horizontally
+
+** Relations
++ ~Class A -- Class B~ :: Relation
++ ~ClA -- ClB : label~ :: Labeled relation
++ ~Driver - Car : drives >~ :: ~<~, ~>~ "acts on" label
+
+** Association Class
++ ~(Student, Course) .. Enrollment~ :: Enrollment associates Student & Course
+
+** Fields & Methods
++ ~<ClassName> : <field>~ :: Add a field to a class
++ ~<ClassName> : <method>()~ :: Add a method to a class
++ ~class <ClassName> { (fields/methods) }~  :: Define a class
+
+** Visibility
++ ~-~ : private
++ ~#~ : protected
++ =~= : package private
++ ~+~ : public
+
+** Abstract, Static, Stereotypes, annotation, enum
++ ~{static}~ :: static modifier
++ ~{abstract}~ :: Abstract modifer
++ ~<< name >>~ :: Stereotype (interface)
++ ~enum~ :: Define an enumeration
++ anootation :: Define an annotation
+
+** Separators
++ ~==~ :: Thick line
++ ~..~ :: Dotted line
++ =--= :: Plain line
++ ~__~ :: Medium line
++ ~-- label --~ :: Labeled line
+
+** Notes
++ ~note "text" as N1~ :: Define a floating note; attach with ~..~
++ ~note left of <class>~ :: Attach note above <class>
++ ~note right of <class>~ :: Attach note right <class>
++ ~note top of <class>~ :: Attach note top <class>
++ ~note bottom of <class>~ :: Attach note bottom <class>
++ ~note <left|right|top|bottom> on link~ :: Add a note to a link
+
+** Example Class Diagram
+#+name: Example Class Diagram
+#+begin_src plantuml :file class.png :cmdline -config plantuml.txt
+  title Example Class Diagram
+
+  HumanDriver "1" -- Car : drives >
+  MachineDriver "1" -- Car : controls >
+
+  Car *- "4" Wheel : has >
+  note bottom on link #F9DEDE: TODO: change to # axles
+
+  Car --> HumanDriver : < owns
+
+  Driver ()-- HumanDriver
+
+  Driver ()-- MachineDriver
+
+  note as DISCLAIMER
+	  Use flymode at your own risk.
+	  Provided as-is.
+  end note
+
+  note top of Driver : Can be human or machine
+  abstract class Driver
+
+  class HumanDriver << Driver >> {
+	  + name
+	  + dob
+	  + license
+  }
+
+  DISCLAIMER .. Car
+  class Car {
+	  - internalSpecs
+	  --
+	  + color
+	  + turn()
+	  + accelerate()
+	  + brake()
+	  ..
+	  + fly()
+  }
+
+  class Foo {
+	  color
+	  wheels
+  }
+#+end_src
+
+#+RESULTS: Example Class Diagram
+[[file:class.png]]
